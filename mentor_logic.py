@@ -3,7 +3,18 @@ import os
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-def ask_llm(messages):
+def ask_llm(prompt):
+
+    messages = [
+        {
+            "role": "system",
+            "content": "You are an expert AI mentor helping university students with career guidance."
+        },
+        {
+            "role": "user",
+            "content": prompt
+        }
+    ]
 
     response = client.chat.completions.create(
         model="llama-3.1-8b-instant",
@@ -19,15 +30,19 @@ def career_guidance(chat_history, question):
     messages = [
         {
             "role": "system",
-            "content": "You are an expert AI mentor helping university students with career guidance."
+            "content": "You are an expert AI mentor helping university students."
         }
     ]
 
     messages.extend(chat_history)
 
-    messages.append({"role": "user", "content": question})
+    response = client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        temperature=0.3,
+        messages=messages
+    )
 
-    return ask_llm(messages)
+    return response.choices[0].message.content
 
 
 def recommend_courses(field):
